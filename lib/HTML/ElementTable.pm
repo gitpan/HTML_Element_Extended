@@ -41,21 +41,26 @@ my $CM = join('|', @Content_Methods);
 sub extent {
   my $self = shift;
   @_ || return ($self->maxrow,$self->maxcol);
-  my($rows,$cols) = @_;
-  defined $rows && defined $cols || croak "Row and Column dimensions required";
+  my($maxrow, $maxcol) = @_;
+  defined $maxrow && defined $maxcol
+    or croak "Max row and col dimensions required";
+#  print "current r,c: ",$self->maxrow, ',', $self->maxcol,"\n";
+#  print "attempt r,c: $maxrow,$maxcol\n";
 
   # Hit rows
-  $self->_adjust_content($self,$rows,$self->maxrow)
-    if $rows != $self->maxrow ;
+  $self->_adjust_content($self, $maxrow, $self->maxrow)
+    if $maxrow != $self->maxrow;
   
   # Hit columns
   my @rows = $self->is_empty ? () : @{$self->content};
-  if ($cols != $self->maxcol) {
-    grep($self->_adjust_content($_,$cols,$self->maxcol),@rows);
-  } elsif ($rows > $self->maxrow) {
-    grep($self->_adjust_content($_,$self->maxcol,-1),
-	 @rows[$self->maxrow+1 .. $rows]);
+  if ($maxcol != $self->maxcol) {
+    grep($self->_adjust_content($_, $maxcol, $self->maxcol), @rows);
   }
+
+  # New data cells caused by new rows will be
+  # automatically taken care of within _adjust_content
+
+#  print "interim r,c: ",$self->maxrow, ',', $self->maxcol,"\n";
 
   # Re-glob
   $self->refresh;
@@ -108,37 +113,42 @@ sub refresh {
 sub _adjust_content {
   my $self = shift;
   my($e,$limit,$old) = @_;
-  ref $e || croak "Element required";
-  defined $limit || croak "Index limit required";
+  ref $e or croak "Element required";
+  defined $limit or croak "Index limit required";
   if (!defined $old) {
     grep(++$old,@{$e->content});
   }
-  my($found,$i);
-
   if ($limit < $old) {
     # We are trimming
-    $i = -1;
+    my($i, $c, $found);
+    $i = $c = -1;
+    # We mess with $i like this to avoid having
+    # non data elements throw off our grid count
     foreach (@{$e->content}) {
+      ++$c;
       next unless ref;
-      ++$i unless $found;
+      ++$i;
       if ($i == $limit) {
-	++$found;
+	$found = $c;
 	next;
       }
-      $_->delete if $found;
+      $_->delete if $found;           
     }
-    @{$e->content} = @{$e->content}[0..$i] if $found;
-  } elsif ($limit > $old) {
+    @{$e->content} = @{$e->content}[0..$found];
+  }
+  elsif ($limit > $old) {
     # We are growing
     my($tag,$d,$r);
     foreach ($old+1..$limit) {
       if ($e->tag eq 'table') {
 	$r = new HTML::ElementTable::RowElement;
 	if ($self->maxcol != -1) {
+	  # Brand new colums...use -1 as old to get 0
 	  $self->_adjust_content($r,$self->maxcol,-1);
 	}
 	$e->push_content($r);
-      } else {
+      }
+      else {
 	$d = new HTML::ElementTable::DataElement;
 	$d->blank_fill($self->blank_fill);
 	$e->push_content($d);
@@ -149,16 +159,14 @@ sub _adjust_content {
 }
 
 sub maxrow {
-  my $self = shift;
-  my $maxrow = shift;
+  my($self, $maxrow) = @_;
   $self->extent($maxrow,$self->maxcol) if defined $maxrow;
   $self->_rows->glob_is_empty ? -1 : $#{$self->_rows->glob_content};
 }
 
 sub maxcol {
-  my $self = shift;
-  my $maxcol = shift;
-  $self->extent($maxcol,$self->maxrow) if defined $maxcol;
+  my($self, $maxcol) = @_;
+  $self->extent($self->maxrow, $maxcol) if defined $maxcol;
   $self->_cols->glob_is_empty ? -1 : $#{$self->_cols->glob_content};
 }
 

@@ -1,7 +1,7 @@
 # HTML_Element_Extended
 
 $NAME    = 'HTML_Element_Extended';
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 $| = 1;
 $missing_modules = 0;

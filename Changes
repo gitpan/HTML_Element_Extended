@@ -8,3 +8,5 @@ Revision history for Perl extension HTML_Element_Extended.
 	- Minor typos corrected for tests
 1.02  Thu Sep 16 15:33:41 CDT 1999
 	- Bundle fix
+1.03  Wed Nov 17 23:53:58 CST 1999
+	- dynamic maxrow, maxcol, extent bug fix
