@@ -6,3 +6,5 @@ Revision history for Perl extension HTML_Element_Extended.
 	- initial release
 1.01  Thu Aug 19 14:36:05 CDT 1999
 	- Minor typos corrected for tests
+1.02  Thu Sep 16 15:33:41 CDT 1999
+	- Bundle fix
