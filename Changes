@@ -1,0 +1,8 @@
+Revision history for Perl extension HTML_Element_Extended.
+
+0.09  Thu Jul  8 19:02:39 CDT 1999
+	- initial merge from HTML::Element::*
+1.00  Tue Jul 27 21:55:43 CDT 1999
+	- initial release
+1.01  Thu Aug 19 14:36:05 CDT 1999
+	- Minor typos corrected for tests

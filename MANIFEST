@@ -1,0 +1,9 @@
+README
+Makefile.PL
+test.pl
+Changes
+MANIFEST
+HTML/ElementSuper.pm
+HTML/ElementGlob.pm
+HTML/ElementTable.pm
+HTML/ElementRaw.pm
